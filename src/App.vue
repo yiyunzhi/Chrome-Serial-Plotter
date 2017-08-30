@@ -284,8 +284,8 @@
     import LineChart from './components/LineChart'
     import colorMixin from './mixins/color'
     import ExportImage from './components/ExportImage.vue'
-        import {createClient} from 'connect.io'
-        const client = createClient();
+    import {createClient} from 'connect.io'
+    const client = createClient();
     export default {
         name: "App",
         mixins: [colorMixin],
@@ -494,16 +494,20 @@
             "export-image": ExportImage
         },
         methods: {
-            fill_data: function (str) {
+        /**
+         * @param str Array to plot
+         * Function fill data to chartjs
+         */
+        fill_data: function (str) {
                 var data_arr = [];
                 for (var k = 0; k < str.length; k++) {
                     data_arr=(str[k].content.split(","));
-                    //data_arr=["1","2","3"]
+                    //here data_arr=["1","2","3"]
                     data_arr=data_arr.map(function (o) {
                         return parseInt(o);
                     });
-                    //data_arr=[1,2,3]
-                    //create new datasets for Chart
+                    //here data_arr=[1,2,3]
+                    //create new datasets for Chartjs
                     if (data_arr.length > this.p_data_count) {
                         for (var j = this.p_data_count; j < data_arr.length; j++) {
                             this.p_data.datasets.push(
@@ -520,7 +524,7 @@
                         this.p_data_count = data_arr.length;
                     }
 
-                    //1,2,3 =3 length of every line =data_arr[n].length
+                    //1,2,3 =3 length of every line
                     if (data_arr.length == this.p_data_count) {
                         for (var i = 0; i < data_arr.length; i++) {
                             if (this.p_data.datasets[i].data.length > this.p_infos.p_point_count) {
@@ -531,18 +535,28 @@
                         if (this.p_data.labels.length > this.p_infos.p_point_count) {
                             this.p_data.labels.shift();
                         }
-                       // console.log(str[k].id);
                         this.p_data.labels.push(str[k].id);
                     }
                     data_arr.length=0;
                 }
             },
+            /**
+             * @return random Number for test
+             * Function generate a random Number fot test
+             */
             getRandomInt () {
                 return Math.floor(Math.random() * (50 - 5 + 1)) + 5
             },
+            /**
+             * handle function for tab change
+             */
             tab_handle_click(){
 
             },
+            /**
+             * @param e Htmlelement object
+             * Function for Tooltip generation, that selected String to HEX or back.
+             */
             ascii_tip(e){
                 if (window.getSelection().toString().length > 0 && e.which == 1) {
                     var text = window.getSelection().toString();
@@ -573,9 +587,15 @@
                     this.clear_ascii_tip();
                 }
             },
+            /**
+             * Function for close Tooltip generation, that selected String to HEX or back.
+             */
             clear_ascii_tip: function () {
                 this.obj_ascii_tip = null;
             },
+            /**
+             * Function watch the change of SenderTimer.
+             */
             send_loop_ms_change(){
                 if (this.s_infos.s_current_send_loop_ms < this.s_infos.s_send_min_loop_ms && this.s_infos.s_current_send_loop_ms != 0) {
                     this.s_infos.btn_send_disabled = true;
@@ -585,6 +605,9 @@
                 }
                 //console.log(this.s_infos.s_current_send_postfix);
             },
+            /**
+             * Function connect or disconnect the selected Serialport per Client.send.
+             */
             s_a_connect(){
                 var self = this;
                 if (this.s_infos.s_is_connected) {
@@ -629,8 +652,10 @@
                     });
                 }
             },
+            /**
+             * Function pause current connected Serialport.
+             */
             s_a_pause_data(){
-                //pause fill data
                 this.s_infos.s_paused = !this.s_infos.s_paused;
                 var self = this;
                 client.send('s_pause', {
@@ -647,6 +672,9 @@
                     });
                 });
             },
+            /**
+             * Function clear the Buffer.
+             */
             clear_serial_buffer: function () {
                 this.serial_string.splice(0);
                 this.serial_string_arr.splice(0);
@@ -664,6 +692,9 @@
                 this.p_data.labels.splice(0);
                 this.p_data.datasets.length = 0;
             },
+            /**
+             * Function  format the Strings, which will to connected Serialport send.
+             */
             send_str: function () {
                 if (this.s_infos.s_send_is_sending) {
                     clearInterval(this.s_send_timer);
@@ -713,6 +744,9 @@
                     }
                 }
             },
+            /**
+             * Function send formatted Strings per Client.send() to connected Serialport.
+             */
             send_to_serial: function (str) {
                 var self=this;
                 client.send('s_send', {
@@ -724,8 +758,10 @@
                     console.log('send_response error', err);
                 });
             },
+            /**
+             * Function receive String that from Backendscript of Chrome.
+             */
             receive_str: function (str) {
-                //this.serial_string.splice(0, str.length);
                 this.s_infos.rx_bytes += _.sum(_.map(str, function (o) {
                     if (o.type != 1) {
                         return o.length_t;
@@ -736,6 +772,9 @@
                 this.serial_string_arr = this.serial_string_arr.concat(str);
                 this.update_cluster(str.length);
             },
+            /**
+             * Function handle scroll-event inner of Scroll-Cluster
+             */
             onScroll: function (e) {
                 this.clear_ascii_tip();
                 this.top_idx = this.serial_string_arr.length - 1 - Math.floor(e.target.scrollTop / this.page_line_height);
@@ -751,8 +790,10 @@
                     this.cp_list_top_padding = this.cp_list_height - e.target.scrollTop;
                 }
                 this.cp_list_bottom_padding = e.target.scrollTop;
-                //console.log(this.top_idx, this.bottom_idx, this.serial_string.length);
             },
+            /**
+             * Function convert String to HEX.
+             */
             string2hex: function (str) {
                 var arr = [];
                 for (var i = 0; i < str.length; i++) {
@@ -760,6 +801,9 @@
                 }
                 return arr.join(" ");
             },
+            /**
+             * Function convert a Hex to a ASCII-Char.
+             */
             hex2a: function (hex) {
                 var str = '';
                 str += String.fromCharCode(parseInt(hex.substr(2, 2), 16));
@@ -785,11 +829,17 @@
                 x(b);
                 return array;
             },
+            /**
+             * Function update Scroll-Cluster.
+             */
             update_cluster: function (l) {
                 this.cp_list_height += l * this.page_line_count;
                 this.cp_list_top_padding = this.cp_list_height;
                 //console.log(this.cp_list_height,this.serial_string);
             },
+            /**
+             * Function for test, i:IDs,j: how many loop
+             */
             test: function () {
                 var self = this;
                 var i = 0;
@@ -812,16 +862,14 @@
                         arr.length = 0;
                     }
                     if (j == 5) {
-                        //console.log(self.p_data);
                         clearInterval(t);
                     }
-                    // console.log(self.cp_list_bottom_padding,self.cp_window_cluster_start);
                 }, 0)
             }
 
         },
         updated: function () {
-            //console.log(this.$refs.li_height_prob.clientHeight);
+
         },
         created: function () {
             var self = this;
@@ -832,16 +880,10 @@
                 console.log("client get devices error:", error);
             });
             client.on('s_get_data', function (data) {
-                //if(self.tab_active_name=="MONITOR"){
-                    self.receive_str(data);
-                    self.fill_data(data);
-                //}
-
+                self.receive_str(data);
+                self.fill_data(data);
             });
             client.on('s_get_data_p', function (data) {
-               // if(self.tab_active_name=="PLOTTER"){
-                    self.fill_data(data);
-               // }
 
             });
             client.on('s_get_data_error', function (err) {

@@ -1,6 +1,7 @@
 # serial_plotter
 
-> A Vue.js project
+> A Chromeextension project base on Vuejs v2.x. With this Application you can access you serial devices. In this
+Application a SerialMonitor and Plotter that were with Vuejs implemented.
 
 ## Build Setup
 
@@ -13,6 +14,9 @@ npm run dev
 
 # build for production with minification
 npm run build
+
+# build for ChromeExtension
+npm run dev_background
 
 # build for production and view the bundle analyzer report
 npm run build --report
