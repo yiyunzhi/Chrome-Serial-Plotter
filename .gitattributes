@@ -1,2 +1,2 @@
-dist/static/ export-ignore
-src/assets/  export-ignore
+* linguist-vendored
+*.js .vue linguist-vendored=false
