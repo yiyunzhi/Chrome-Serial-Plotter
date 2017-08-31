@@ -1,1 +1,2 @@
 dist/static/ export-ignore
+src/assets/  export-ignore
